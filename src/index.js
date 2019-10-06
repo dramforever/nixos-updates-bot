@@ -33,10 +33,14 @@ async function handle(request) {
             throw 'Bad request';
         }
 
-        if (data.action === 'update')
-            await update.performUpdate();
-        else
+        if (data.action === 'update') {
+            update.performUpdate()
+                .then((res) => console.log('Update done', res))
+                .then((err) => console.log('Update', err))
+            return 'ok';
+        } else {
             throw 'Bad action';
+        }
 
         return 'done'
     } else {
