@@ -34,9 +34,13 @@ async function handle(request) {
         }
 
         if (data.action === 'update') {
-            update.performUpdate()
-                .then(() => console.log('Update done'))
-                .catch((err) => console.log('Update', err))
+            setTimeout(() => {
+                update.performUpdate()
+                    .then(() => console.log('Update done'))
+                    .catch((err) => console.log('Update', err));
+
+            }, Math.random() * 60 * 1000); // Add random delay
+
             return 'ok';
         } else {
             throw 'Bad action';
