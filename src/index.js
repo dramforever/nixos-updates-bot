@@ -35,8 +35,8 @@ async function handle(request) {
 
         if (data.action === 'update') {
             update.performUpdate()
-                .then((res) => console.log('Update done', res))
-                .then((err) => console.log('Update', err))
+                .then(() => console.log('Update done'))
+                .catch((err) => console.log('Update', err))
             return 'ok';
         } else {
             throw 'Bad action';
