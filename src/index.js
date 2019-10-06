@@ -41,8 +41,6 @@ async function handle(request) {
         } else {
             throw 'Bad action';
         }
-
-        return 'done'
     } else {
         throw 'Bad path'
     }

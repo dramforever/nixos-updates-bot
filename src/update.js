@@ -61,7 +61,9 @@ export async function performUpdate() {
 }
 
 export async function readData() {
+    console.log('read1');
     const client = new Client();
+    console.log('read2');
 
     try {
         await client.connect(process.env.DATABASE_URL);
