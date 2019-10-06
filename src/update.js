@@ -67,7 +67,10 @@ export async function readData() {
         await client.connect();
         const res = await client.query('select data from bot_state limit 1');
 
-        return JSON.parse(res.rows[0].data);
+        if (res.rows.length > 0)
+            return JSON.parse(res.rows[0].data);
+        else
+            return null;
     } finally {
         client.end();
     }
