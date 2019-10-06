@@ -86,7 +86,7 @@ export async function writeData(data) {
         await client.query('delete from bot_state');
         await client.query('insert into bot_state (data) values ($1)', [ JSON.stringify(data) ]);
 
-        return JSON.parse(res.rows[0].data);
+        await client.query('COMMIT');
     } finally {
         client.query('ROLLBACK');
         client.end();
