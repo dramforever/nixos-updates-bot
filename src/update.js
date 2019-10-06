@@ -49,7 +49,7 @@ export async function performUpdate() {
         cache.seen[link] = newData;
     }
 
-    for (const msg in messages) {
+    for (const msg of messages) {
         console.log(msg);
         await telegram.sendMessage(msg);
         await new Promise((resolve, reject) => setTimeout(resolve, 1000));
