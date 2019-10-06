@@ -16,7 +16,7 @@
         "webpack-cli": "^3.3.9"
     },
     "scripts": {
-        "build": "webpack",
+        "build": "webpack --config webpack.dev.js",
         "webpack-watch": "webpack --config webpack.dev.js --watch",
         "start": "node dist/main.js"
     }
