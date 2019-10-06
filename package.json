@@ -17,7 +17,7 @@
     },
     "scripts": {
         "build": "webpack",
-        "webpack-watch": "webpack --watch",
+        "webpack-watch": "webpack --config webpack.dev.js --watch",
         "start": "node dist/main.js"
     }
 }
