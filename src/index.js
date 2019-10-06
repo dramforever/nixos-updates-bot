@@ -20,6 +20,8 @@ function readRequest(request) {
 }
 
 async function handle(request) {
+    console.log('url =', url);
+
     if (request.url === '/update') {
         if (request.method !== 'POST')
             throw 'Bad request';
@@ -30,7 +32,7 @@ async function handle(request) {
 
         if (! process.env.BOT_SECRET
             || data.secret !== process.env.BOT_SECRET) {
-            throw 'Bad request';
+            throw 'Bad secret';
         }
 
         if (data.action === 'update')
