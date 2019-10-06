@@ -64,7 +64,7 @@ export async function readData() {
     const client = new Client({ connectionString: process.env.DATABASE_URL });
 
     try {
-        await client.connect(process.env.DATABASE_URL);
+        await client.connect();
         const res = await client.query('select data from bot_state limit 1');
 
         return JSON.parse(res.rows[0].data);
@@ -77,7 +77,7 @@ export async function writeData(data) {
     const client = new Client({ connectionString: process.env.DATABASE_URL });
 
     try {
-        await client.connect(process.env.DATABASE_URL);
+        await client.connect();
         await client.query('BEGIN');
 
         await client.query('delete from bot_state', data);
