@@ -55,7 +55,7 @@ export default function topLevel(request, response) {
             if (typeof err === 'string') {
                 response.end(err);
             } else {
-                console.error(err.stack);
+                console.log(err.stack);
                 response.end(err.constructor.name);
             }
         });
