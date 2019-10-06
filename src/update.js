@@ -1,6 +1,6 @@
 import * as crawler from './crawler';
 import * as telegram from './telegram';
-import { MongoClient } from 'mongodb';
+import { Client } from 'pg';
 
 export async function performUpdate() {
     let cache = await readData();
@@ -61,20 +61,31 @@ export async function performUpdate() {
 }
 
 export async function readData() {
-    const client = new MongoClient(process.env.DATABASE);
-    await client.connect();
+    const client = new Client();
 
-    const coll = client.db('nixos_updates_bot').collection('state');
+    try {
+        await client.connect(process.env.DATABASE_URL);
+        const res = await client.query('select data from bot_state limit 1');
 
-    return await coll.findOne({ _tag: 'nixos_updates_bot' });
+        return JSON.parse(res.rows[0].data);
+    } finally {
+        client.end();
+    }
 }
 
 export async function writeData(data) {
-    data._tag = 'nixos_updates_bot';
+    const client = new Client();
 
-    const client = new MongoClient(process.env.DATABASE);
-    await client.connect();
+    try {
+        await client.connect(process.env.DATABASE_URL);
+        await client.query('BEGIN');
 
-    const coll = client.db('nixos_updates_bot').collection('state');
-    await coll.findOneAndReplace({ _tag: 'nixos_updates_bot' }, data, { upsert: true });
+        await client.query('delete from bot_state', data);
+        await client.query('insert into bot_state (data) values ($1)', data);
+
+        return JSON.parse(res.rows[0].data);
+    } finally {
+        client.query('ROLLBACK');
+        client.end();
+    }
 }
