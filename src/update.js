@@ -83,8 +83,8 @@ export async function writeData(data) {
         await client.connect();
         await client.query('BEGIN');
 
-        await client.query('delete from bot_state', data);
-        await client.query('insert into bot_state (data) values ($1)', data);
+        await client.query('delete from bot_state');
+        await client.query('insert into bot_state (data) values ($1)', [ JSON.stringify(data) ]);
 
         return JSON.parse(res.rows[0].data);
     } finally {
