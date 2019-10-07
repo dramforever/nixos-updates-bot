@@ -87,5 +87,5 @@ export function generateDiff(chan, oldData, newData, comp) {
         );
     }
 
-    return [ header, updateLine, delta, timeSeg, ... linkSeg ].join('\n');
+    return [ header, updateLine, delta, timeSeg, ... linkSegParts ].join('\n');
 }
