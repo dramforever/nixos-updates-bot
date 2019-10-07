@@ -18,3 +18,7 @@ If you want to somehow deploy *another* *same* bot:
     - `ARMED`: `true` if you want the bot to send telegram messages
     - `PORT`: Port to listen on. Defaults to `5000`
 - Periodically `POST` to `/update` with json like `{ "secret": "<bot secret>", "action": "update" }`. An update will run in the background.
+
+## Icon
+
+Icon based on [Nix official icon](https://github.com/NixOS/nixos-artwork/blob/master/logo/nix-snowflake.svg) and [Octicons `radio-tower](https://octicons.github.com/icon/radio-tower/).
