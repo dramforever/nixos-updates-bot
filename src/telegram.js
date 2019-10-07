@@ -53,7 +53,7 @@ export function generateDiff(chan, oldData, newData, comp) {
 
     const delta = deltaPieces
         .filter(pc => pc[1] !== undefined && pc[1] !== 0)
-        .map(pc => `${pc[0]} ${pc[1]}`)
+        .map(pc => `${pc[0]} \`${pc[1]}\``)
         .join('    ');
 
     function gen_dt() {
@@ -87,7 +87,5 @@ export function generateDiff(chan, oldData, newData, comp) {
         );
     }
 
-    const linkSeg = linkSegParts.length ? [ linkSegParts.join('  ') ] : [];
-
-    return [ header, updateLine, '', delta, '', timeSeg, ... linkSeg ].join('\n');
+    return [ header, updateLine, delta, timeSeg, ... linkSeg ].join('\n');
 }
