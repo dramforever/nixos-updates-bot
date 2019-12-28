@@ -100,18 +100,18 @@ export function generateDiff(chan, oldData, newData, comp) {
     if (newData.gitRev) {
         linkSegParts.push(
             (oldData === null || oldData.gitRev === null)
-            ? `[View on GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs-channels/commits/${newData.gitRev})`
-            : `[View on GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs-channels/compare/${oldData.gitRev}...${newData.gitRev})`
+            ? `[GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs-channels/commits/${newData.gitRev})`
+            : `[GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs-channels/compare/${oldData.gitRev}...${newData.gitRev})`
         );
     }
 
     if (newData.hydraNum) {
         linkSegParts.push(
             (oldData === null || oldData.hydraNum === null)
-                ? `[View on Hydra (${newData.hydraNum})](https://hydra.nixos.org/eval/${newData.hydraNum})`
-                : `[View on Hydra (${newData.hydraNum})](https://hydra.nixos.org/eval/${newData.hydraNum}?compare=${oldData.hydraNum})`
+                ? `[Hydra (${newData.hydraNum})](https://hydra.nixos.org/eval/${newData.hydraNum})`
+                : `[Hydra (${newData.hydraNum})](https://hydra.nixos.org/eval/${newData.hydraNum}?compare=${oldData.hydraNum})`
         );
     }
 
-    return [ header, updateLine, delta, timeSeg, ... linkSegParts ].join('\n');
+    return [ header, updateLine, delta, timeSeg, linkSegParts.join(', ') ].join('\n');
 }
