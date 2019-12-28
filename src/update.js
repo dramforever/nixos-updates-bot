@@ -13,8 +13,6 @@ export async function performUpdate() {
 
     if (! ('seen' in cache)) cache.seen = {};
 
-    const messages = [];
-
     let cacheChanged = false;
 
     for (const { link, lastUpdated } of channels) {
@@ -44,15 +42,10 @@ export async function performUpdate() {
             ... channelData
         };
 
-        messages.push(telegram.generateDiff(link, oldData, newData, hydraComp));
+        const msg = telegram.generateDiff(link, oldData, newData, hydraComp);
+        await telegram.broadcastMessage(msg, link);
 
         cache.seen[link] = newData;
-    }
-
-    for (const msg of messages) {
-        console.log(msg);
-        await telegram.sendMessage(msg);
-        await new Promise((resolve, reject) => setTimeout(resolve, 1000));
     }
 
     if (cacheChanged) {

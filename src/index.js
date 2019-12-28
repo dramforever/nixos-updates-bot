@@ -1,5 +1,6 @@
 import * as update from './update';
 import http from 'http';
+import { handleMessage } from './sub';
 import { Client } from 'pg';
 
 function readRequest(request) {
@@ -21,6 +22,8 @@ function readRequest(request) {
 }
 
 async function handle(request) {
+    const WEBHOOK_PATH = `/webhook/${process.env.BOT_SECRET}`;
+
     if (request.url === '/update') {
         if (request.method !== 'POST')
             throw 'Bad request';
@@ -46,6 +49,14 @@ async function handle(request) {
         } else {
             throw 'Bad action';
         }
+    } else if (request.url == WEBHOOK_PATH) {
+        const dataRaw = await readRequest(request);
+        const data = JSON.parse(dataRaw);
+        if (data.message) {
+            return handleMessage(data.message);
+        } else {
+            return 'ignored';
+        }
     } else {
         throw 'Bad path'
     }
@@ -60,6 +71,11 @@ async function setupDatabase() {
             create table if not exists bot_state (
                 data text not null
             );
+            create table if not exists subscriptions (
+                chat_id bigint not null,
+                channel text not null,
+                unique (channel, chat_id)
+            );
         `);
     } finally {
         client.end();
@@ -69,8 +85,13 @@ async function setupDatabase() {
 export default function topLevel(request, response) {
     handle(request)
         .then((res) => {
-            response.writeHead(200, { 'Content-Type': 'text/plain' });
-            response.end(res)
+            if (typeof res === 'object') {
+                response.writeHead(200, { 'Content-Type': 'application/json' });
+                response.end(JSON.stringify(res));
+            } else {
+                response.writeHead(200, { 'Content-Type': 'text/plain' });
+                response.end(res)
+            }
         })
         .catch((err) => {
             response.writeHead(400, { 'Content-Type': 'text/plain' });

@@ -1,4 +1,5 @@
 import { request } from './crawler';
+import { Client } from 'pg';
 
 export async function telegram(method, data) {
     if (process.env.ARMED !== 'true') {
@@ -20,13 +21,38 @@ export async function telegram(method, data) {
     return res;
 }
 
-export function sendMessage(msg) {
-    return telegram('sendMessage', {
+async function getSubscribers(channel) {
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+
+    try {
+        await client.connect();
+        const res = await client.query(
+            'select chat_id from subscriptions where channel = $1;',
+            [ channel ]
+        );
+
+        return [].map.call(res.rows, row => row.chat_id);
+    } finally {
+        client.end();
+    }
+}
+
+export async function broadcastMessage(msg, channel) {
+    await telegram('sendMessage', {
         chat_id: '@nixos_updates',
         text: msg,
         parse_mode: 'Markdown',
         disable_web_page_preview: true
     });
+
+    for (const chat_id of await getSubscribers(channel)) {
+        await telegram('sendMessage', {
+            chat_id,
+            text: msg,
+            parse_mode: 'Markdown',
+            disable_web_page_preview: true
+        });
+    }
 }
 
 export function generateDiff(chan, oldData, newData, comp) {
