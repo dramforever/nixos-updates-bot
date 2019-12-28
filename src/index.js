@@ -1,5 +1,6 @@
 import * as update from './update';
 import http from 'http';
+import { Client } from 'pg';
 
 function readRequest(request) {
     return new Promise((resolve, reject) => {
@@ -50,6 +51,21 @@ async function handle(request) {
     }
 }
 
+async function setupDatabase() {
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+
+    try {
+        await client.connect();
+        await client.query(`
+            create table if not exists bot_state (
+                data text not null
+            );
+        `);
+    } finally {
+        client.end();
+    }
+}
+
 export default function topLevel(request, response) {
     handle(request)
         .then((res) => {
@@ -66,6 +82,11 @@ export default function topLevel(request, response) {
             }
         });
 }
+
+setupDatabase().catch(err => {
+    console.log("Cannot setup database: ", err);
+    process.exit(1)
+});
 
 const server = http.createServer(topLevel);
 const port = process.env.PORT || 5000;
