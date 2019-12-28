@@ -10,7 +10,7 @@ async function subscribe(chat_id, channel) {
             [ chat_id, channel ]
         );
     } finally {
-        client.end();
+        await client.end();
     }
 }
 
@@ -24,7 +24,7 @@ async function unsubscribe(chat_id, channel) {
             [ chat_id, channel ]
         );
     } finally {
-        client.end();
+        await client.end();
     }
 }
 

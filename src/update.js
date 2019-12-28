@@ -65,7 +65,7 @@ export async function readData() {
         else
             return null;
     } finally {
-        client.end();
+        await client.end();
     }
 }
 
@@ -82,6 +82,6 @@ export async function writeData(data) {
         await client.query('COMMIT');
     } finally {
         client.query('ROLLBACK');
-        client.end();
+        await client.end();
     }
 }

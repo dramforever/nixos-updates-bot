@@ -78,7 +78,7 @@ async function setupDatabase() {
             );
         `);
     } finally {
-        client.end();
+        await client.end();
     }
 }
 

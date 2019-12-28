@@ -33,7 +33,7 @@ async function getSubscribers(channel) {
 
         return [].map.call(res.rows, row => row.chat_id);
     } finally {
-        client.end();
+        await client.end();
     }
 }
 
