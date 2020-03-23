@@ -1,4 +1,5 @@
 module.exports = {
     target: 'node',
-    mode: 'production'
+    mode: 'development',
+    devtool: 'inline-cheap-module-source-map'
 };

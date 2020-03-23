@@ -12,10 +12,10 @@ export function request(reqUrl, body = null, headers = null) {
         headers['Content-Length'] = body.length;
     }
 
-    const options = Object.assign({}, url.parse(reqUrl), {
-        method: body === null ? 'GET' : 'POST',
-        headers
-    });
+    const method = headers.method || (body === null ? 'GET' : 'POST');
+    delete headers.method;
+
+    const options = Object.assign({}, url.parse(reqUrl), { method, headers });
 
     return new Promise((resolve, reject) => {
         const req = https.request(
@@ -52,27 +52,33 @@ export function request(reqUrl, body = null, headers = null) {
 }
 
 export async function getChannels() {
+    const Minio = require('minio');
 
-    const NIX_CHANNELS = 'https://nixos.org/channels';
+    const client = new Minio.Client({
+        endPoint: 's3.amazonaws.com'
+    });
 
-    console.log("Fetching channel list...");
-    const chanResp = await request(`${NIX_CHANNELS}/`);
+    const objects = await new Promise((resolve, reject) => {
+        const stream = client.listObjectsV2('nix-channels');
+        const res = []
 
-    const $ = cheerio.load(chanResp.body);
+        stream.on('data', (obj) => res.push(obj));
+        stream.on('error', (err) => reject(err));
+        stream.on('end', () => resolve(res));
+    });
+
+    const re = /^(nixos|nixpkgs)-.+[^/]$/;
+
     const res = [];
 
-    for (const row of Array.from($('tr'))) {
-        const grids = $(row).children('td');
-        if (grids.length === 5) {
-            const link = $(grids[1]).children('a').attr('href');
-            const name = $(grids[1]).text().trim();
-            const lastUpdated = $(grids[2]).text().trim();
+    for (const obj of objects) {
+        if (! re.test(obj.name))
+            continue;
 
-            if (link.includes('/')) // Link to parent directory
-                continue;
-
-            res.push({ link, lastUpdated });
-        }
+        res.push({
+            link: obj.name,
+            lastUpdated: obj.lastModified
+        });
     }
 
     return res;
@@ -96,11 +102,13 @@ export function genVersion(slug) {
 }
 
 export async function fetchChannel(chan) {
-    const NIX_CHANNELS = 'https://nixos.org/channels';
+    const response = await request(
+        `https://nix-channels.s3.amazonaws.com/${chan}`,
+        null,
+        { method: 'HEAD' }
+    );
 
-    const dest = await request(`${NIX_CHANNELS}/${chan}`);
-
-    const releaseDest = dest.headers['location'];
+    const releaseDest = response.headers['x-amz-website-redirect-location'];
 
     const slug = releaseDest.split('/').pop();
     const ver = genVersion(slug);

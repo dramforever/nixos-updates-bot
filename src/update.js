@@ -17,7 +17,7 @@ export async function performUpdate() {
 
     for (const { link, lastUpdated } of channels) {
         if (link in cache.seen
-            && cache.seen[link].time === lastUpdated) {
+            && cache.seen[link].time === lastUpdated.toISOString()) {
             continue;
         }
 
@@ -81,7 +81,7 @@ export async function writeData(data) {
 
         await client.query('COMMIT');
     } finally {
-        client.query('ROLLBACK');
+        await client.query('ROLLBACK');
         await client.end();
     }
 }
