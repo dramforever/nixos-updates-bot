@@ -91,9 +91,9 @@ export function generateDiff(chan, oldData, newData, comp) {
         else return `${remh}h`;
     }
 
-    const timeSeg = `${newData.time}${oldData == null ? "" : ` (${gen_dt()} since last)`}`
+    console.log(newData, oldData);
 
-    console.log(newData);
+    const timeSeg = `${newData.time.toISOString()}${oldData == null ? "" : ` (${gen_dt()} since last)`}`
 
     const linkSegParts = []
 
