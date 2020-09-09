@@ -1,5 +1,7 @@
 import { Client } from "pg";
 
+const BOT_USERNAME = process.env.BOT_USERNAME || 'nixos_updates_bot';
+
 async function subscribe(chat_id, channel) {
     const client = new Client({ connectionString: process.env.DATABASE_URL });
 
@@ -29,23 +31,31 @@ async function unsubscribe(chat_id, channel) {
 }
 
 export async function handleMessage(message) {
-    if (! message.from || ! message.text || message.chat.type !== 'private') {
+    if (! message.from || ! message.text
+        || ! ['private', 'group', 'supergroup'].includes(message.chat.type)) {
         return ''; // Bad message
     }
 
     const chat_id = message.chat.id;
 
-    const command_match = message.text.match(/^\/(\w+)\s+(.+)\s*$/)
+    const command_match = message.text.match(/^\/(\w+)(@\w+)?\s+(.+)\s*$/)
+
+    const usage = message.chat.type === 'group'
+        ? `Please use /subscribe@${BOT_USERNAME} (channel) or /unsubscribe@${BOT_USERNAME} (channel)`
+        : 'Please use /subscribe (channel) or /unsubscribe (channel)';
 
     if (command_match === null) {
         return {
             method: 'sendMessage',
             chat_id,
-            text: 'Please use /subscribe (channel) or /unsubscribe (channel)',
+            text: usage,
         };
     }
 
-    const [ , command, channel ] = command_match;
+    const [ , command, target, channel ] = command_match;
+
+    if (message.chat.type === 'group' && target !== '@' + BOT_USERNAME)
+        return ''; // Group chat, avoid command name clash
 
     if (command === 'subscribe') {
         await subscribe(chat_id, channel);
@@ -65,7 +75,7 @@ export async function handleMessage(message) {
         return {
             method: 'sendMessage',
             chat_id,
-            text: 'Sorry, I did not understand\nPlease use /subscribe (channel) or /unsubscribe (channel)',
+            text: 'Sorry, I did not understand\n' + usage,
         };
     }
 }
