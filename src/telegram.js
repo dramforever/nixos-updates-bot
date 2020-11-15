@@ -100,8 +100,8 @@ export function generateDiff(chan, oldData, newData, comp) {
     if (newData.gitRev) {
         linkSegParts.push(
             (oldData === null || oldData.gitRev === null)
-            ? `[GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs-channels/commits/${newData.gitRev})`
-            : `[GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs-channels/compare/${oldData.gitRev}...${newData.gitRev})`
+            ? `[GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs/commits/${newData.gitRev})`
+            : `[GitHub (${newData.gitRev.slice(0, 7)})](https://github.com/NixOS/nixpkgs/compare/${oldData.gitRev}...${newData.gitRev})`
         );
     }
 
